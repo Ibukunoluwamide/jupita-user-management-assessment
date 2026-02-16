@@ -21,8 +21,8 @@ const Login = () => {
         try {
             setLoading(true);
             const response = await api.post("/login", formData);
-
-            localStorage.setItem("token", response.data.access_token);
+           
+            localStorage.setItem("token", response?.data?.access_token);
             toast.success("Login successful");
             navigate("/users");
         } catch (err) {

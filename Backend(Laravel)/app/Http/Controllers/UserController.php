@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    // List all users except the currently authenticated user
     public function index()
     {
         $users = User::where('id', '!=', auth()->id())
@@ -17,6 +18,8 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+
+    // Create a new user
 
     public function store(Request $request)
     {
@@ -33,6 +36,7 @@ class UserController extends Controller
         return response()->json($user, 201);
     }
 
+    // Retrieve a single user by ID
     public function show($id)
     {
         $user = User::find($id);
@@ -44,6 +48,7 @@ class UserController extends Controller
         return response()->json($user);
     }
 
+    // Update an existing user
     public function update(Request $request, $id)
     {
         $user = User::find($id);
@@ -72,6 +77,7 @@ class UserController extends Controller
         return response()->json($user);
     }
 
+    // Delete a user by ID
     public function destroy($id)
     {
         $user = User::find($id);

@@ -9,7 +9,8 @@ import Loader from '../components/Loader';
 const UserForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const isEditMode = id !== undefined;
+    const isEditMode = id !== undefined;  // check if this form is in edit mode
+
     const [showPassword, setShowPassword] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -20,7 +21,7 @@ const UserForm = () => {
     const [loading, setLoading] = useState(false);
 
 
-
+// Fetch user data if in edit mode
     useEffect(() => {
         if (!isEditMode) return;
 

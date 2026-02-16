@@ -5,6 +5,7 @@ import UserForm from './pages/UserForm';
 import './App.css';
 import UserView from './pages/UserView';
 
+// function protect routes that require authentication
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/login" replace />;
