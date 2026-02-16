@@ -3,11 +3,14 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import api from '../api/api';
 import { toast } from 'sonner';
 import AppLayout from '../layouts/AppLayout';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import Loader from '../components/Loader';
 
 const UserForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = id !== undefined;
+    const [showPassword, setShowPassword] = useState(false);
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -61,76 +64,119 @@ const UserForm = () => {
             setLoading(false)
         }
     };
+  if (loading) return <Loader />;
 
-    return (
-        <AppLayout title={isEditMode ? 'Edit User' : 'Create New User'}>
-            <div className="container mx-auto px-4 py-8 max-w-lg">
-                
+   return (
+    <AppLayout title={isEditMode ? "Edit User" : "Create User"}>
+        <div className=" flex items-center justify-center px-4 ">
+            <div className="w-full max-w-lg bg-white shadow-xl rounded-2xl border border-gray-100 p-8">
 
-                <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="full_name">
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-800">
+                        {isEditMode ? "Edit User" : "Create User"}
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                        {isEditMode
+                            ? "Update user information below"
+                            : "Fill in the details to create a new user"}
+                    </p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Full Name
                         </label>
                         <input
-                            className="w-full px-3 py-2 border border-blue-500   rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            id="full_name"
                             type="text"
-                            placeholder="John Doe"
                             name="full_name"
                             value={formData.full_name}
                             onChange={handleChange}
+                            placeholder="John Doe"
                             required
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                         />
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
                             Email Address
                         </label>
                         <input
-                            className="w-full px-3 py-2 border border-blue-500   rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            id="email"
                             type="email"
-                            placeholder="john@example.com"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
+                            placeholder="john@example.com"
                             required
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                         />
                     </div>
 
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-                            Password {isEditMode && <span className="text-gray-500 font-normal text-xs">(Leave blank to keep current)</span>}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Password{" "}
+                            {isEditMode && (
+                                <span className="text-xs text-gray-500 font-normal">
+                                    (Leave blank to keep current)
+                                </span>
+                            )}
                         </label>
-                        <input
-                            className="w-full px-3 py-2 border border-blue-500   rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            id="password"
-                            type="password"
-                            placeholder="******************"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required={!isEditMode}
-                            minLength={8}
-                        />
+
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="••••••••"
+                                required={!isEditMode}
+                                minLength={8}
+                                className="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-gray-700 transition"
+                            >
+                                {showPassword ? (
+                                    <EyeSlashIcon className="h-5 w-5" />
+                                ) : (
+                                    <EyeIcon className="h-5 w-5" />
+                                )}
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="flex items-center justify-end">
+                    <div className="flex justify-end pt-2">
                         <button
-                            className="bg-blue-500 hover:bg-blue-700 cursor-pointer text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200"
                             type="submit"
                             disabled={loading}
+                            className={`px-6 py-2.5 rounded-lg font-semibold text-white transition duration-200
+                            ${
+                                loading
+                                    ? "bg-blue-400 cursor-not-allowed"
+                                    : "bg-blue-600 hover:bg-blue-700"
+                            }`}
                         >
-                            {loading ? 'Saving...' : (isEditMode ? 'Update User' : 'Create User')}
+                            {loading
+                                ? isEditMode
+                                    ? "Updating..."
+                                    : "Creating..."
+                                : isEditMode
+                                ? "Update User"
+                                : "Create User"}
                         </button>
-                      
                     </div>
+
                 </form>
             </div>
-        </AppLayout>
-    );
+        </div>
+    </AppLayout>
+);
+
 };
 
 export default UserForm;

@@ -1,80 +1,98 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import api from '../api/api';
-import { toast } from 'sonner';
-import AppLayout from '../layouts/AppLayout';
-import Loader from '../components/Loader';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import api from "../api/api";
+import { toast } from "sonner";
+import AppLayout from "../layouts/AppLayout";
+import Loader from "../components/Loader";
+import { PencilSquareIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 const UserView = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const response = await api.get(`/users/${id}`);
-                setUser(response.data);
-            } catch (err) {
-                toast.error(err.response?.data?.message || 'Failed to fetch user');
-                navigate('/users');
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await api.get(`/users/${id}`);
+        setUser(response.data);
+      } catch (err) {
+        toast.error(err.response?.data?.message || "Failed to fetch user");
+        navigate("/users");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        fetchUser();
-    }, [id, navigate]);
+    fetchUser();
+  }, [id, navigate]);
 
-    if (loading) {
-        return <Loader />;
-    }
+  if (loading) return <Loader />;
 
-    return (
-        <AppLayout title="View User">
-            <div className="container mx-auto px-4 py-8 max-w-lg">
-                <div className="bg-white shadow-md rounded px-8 pt-6 pb-8">
+  return (
+    <AppLayout title="User Details">
+      <div className="flex items-start justify-center px-4 ">
+        <div className="w-full max-w-xl bg-white border border-gray-200 rounded-2xl shadow-lg p-8">
 
-                    <div className="mb-4">
-                        <label className="block text-gray-600 text-sm font-bold mb-2">
-                            Full Name
-                        </label>
-                        <p className="border rounded px-3 py-2 bg-gray-50">
-                            {user?.full_name}
-                        </p>
-                    </div>
-
-                    <div className="mb-4">
-                        <label className="block text-gray-600 text-sm font-bold mb-2">
-                            Email Address
-                        </label>
-                        <p className="border rounded px-3 py-2 bg-gray-50">
-                            {user?.email}
-                        </p>
-                    </div>
-
-                    <div className="flex justify-end gap-3 mt-6">
-                        <Link
-                            to={`/users/${id}/edit`}
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
-                        >
-                            Edit
-                        </Link>
-
-                        <button
-                            onClick={() => navigate('/users')}
-                            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-200"
-                        >
-                            Back
-                        </button>
-                    </div>
-
-                </div>
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">
+                {user?.full_name}
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                User information overview
+              </p>
             </div>
-        </AppLayout>
-    );
+          </div>
+
+          <div className="space-y-6">
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
+                Full Name
+              </p>
+              <div className="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-700">
+                {user?.full_name}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
+                Email Address
+              </p>
+              <div className="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-700">
+                {user?.email}
+              </div>
+            </div>
+
+          </div>
+
+          <div className="flex justify-end gap-3 mt-10">
+
+            <button
+              onClick={() => navigate("/users")}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium transition"
+            >
+              <ArrowLeftIcon className="h-5 w-5" />
+              Back
+            </button>
+
+            <Link
+              to={`/users/${id}/edit`}
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+            >
+              <PencilSquareIcon className="h-5 w-5" />
+              Edit User
+            </Link>
+
+          </div>
+
+        </div>
+      </div>
+    </AppLayout>
+  );
 };
 
 export default UserView;

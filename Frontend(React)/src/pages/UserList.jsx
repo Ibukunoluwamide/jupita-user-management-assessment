@@ -4,13 +4,13 @@ import api from '../api/api';
 import AppLayout from '../layouts/AppLayout';
 import Table from '../components/Table';
 import { EyeIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
-import Loader from '../components/Loader';
 import { toast } from 'sonner';
+import Loader from '../components/Loader';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
     const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -22,10 +22,13 @@ const UserList = () => {
                 if (error.response?.status === 401) {
                     navigate('/login');
                 }
+            }finally{
+                setLoading(false)
             }
         };
         fetchUsers();
     }, [users, navigate]);
+
 
     const handleDelete = async (id) => {
         if (confirm('Are you sure you want to delete this user?')) {
@@ -73,7 +76,7 @@ const UserList = () => {
 
                 </div>
 
-                <Table columns={columns} data={users} actions={actions} />
+                <Table columns={columns} data={users} actions={actions} loading={loading} />
             </div>
 
         </AppLayout>

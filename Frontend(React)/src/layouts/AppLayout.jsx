@@ -1,200 +1,187 @@
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import api from '../api/api'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import Loader from '../components/Loader'
-import { useCurrentUser } from '../api/user'
-
+import {
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuItems,
+} from "@headlessui/react";
+import {
+    Bars3Icon,
+    XMarkIcon,
+} from "@heroicons/react/24/outline";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useCurrentUser } from "../api/user";
+import api from "../api/api";
+import Loader from "../components/Loader";
+import { toast } from "sonner";
 
 const navigation = [
-    { name: 'Dashboard', href: '/users' },
-    { name: 'Create User', href: '/users/create' },
-]
-
+    { name: "Dashboard", href: "/users" },
+    { name: "Create User", href: "/users/create" },
+];
 
 function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
+    return classes.filter(Boolean).join(" ");
 }
 
-export default function AppLayout({ children, title = "Title" }) {
+export default function AppLayout({ children, title = "Dashboard" }) {
     const navigate = useNavigate();
-    const currentPath = useLocation().pathname
-    const user = useCurrentUser()
-    const [loading, setLoading] = useState(true);
+    const currentPath = useLocation().pathname;
+    const user = useCurrentUser();
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, []);
     const handleLogout = async () => {
         try {
-            await api.post('/logout');
-            localStorage.removeItem('token');
-            navigate('/login');
+            await api.post("/logout");
+            localStorage.removeItem("token");
+            toast.success("Log out successful")
+            navigate("/login");
         } catch (error) {
-            console.error('Logout failed:', error);
+            console.error("Logout failed:", error);
         }
     };
 
     if (!user) return <Loader />;
 
     const userNavigation = [
-        { name: 'Settings', href: `/users/${user.id}/edit` },
-        { name: 'Sign out', href: '#', onclick: handleLogout },
-    ]
-
+        { name: "Edit profile", href: `/users/${user.id}/edit` },
+        { name: "Log out", action: handleLogout },
+    ];
 
     return (
-        <>
-            <div className="min-h-full">
-                <Disclosure as="nav" className="bg-gray-500">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="flex h-16 items-center justify-between">
-                            <div className="flex items-center">
-                                <div className="shrink-0">
-                                    <img
-                                        alt="Jupita"
-                                        src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                                        className="size-8"
-                                    />
-                                </div>
-                                <div className="hidden md:block">
-                                    <div className="ml-10 flex items-baseline space-x-4">
-                                        {navigation.map((item) => (
-                                            <a
-                                                key={item.name}
-                                                href={item.href}
-                                                aria-current={item.current ? 'page' : undefined}
-                                                className={classNames(
-                                                    item.href == currentPath ? 'bg-gray-950/50 text-white'
-                                                        : 'text-gray-300 hover:bg-white/5 hover:text-white',
-                                                    'rounded-md px-3 py-2 text-sm font-medium',
-                                                )}
-                                            >
-                                                {item.name}
-                                            </a>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="hidden md:block">
-                                <div className="ml-4 flex items-center md:ml-6">
+        <div className="min-h-screen bg-gray-50">
 
+            <Disclosure as="nav" className="bg-white border-b border-gray-200 shadow-sm">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="flex h-16 justify-between items-center">
 
-                                    {/* Profile dropdown */}
-                                    <Menu as="div" className="relative ml-3">
-                                        <MenuButton className="relative flex max-w-xs items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
-                                            <span className="absolute -inset-1.5" />
-                                            <span className="sr-only">Open user menu</span>
-                                            <img
-                                                alt=""
-                                                src="https://static.vecteezy.com/system/resources/thumbnails/003/337/584/small/default-avatar-photo-placeholder-profile-icon-vector.jpg"
-                                                className="size-8 rounded-full outline -outline-offset-1 outline-white/10"
-                                            />
-                                            <div className="ml-3">
-                                                <div className="text-base/5 font-medium text-white">{user.full_name}</div>
-                                                <div className="text-sm font-medium text-gray-400">{user.email}</div>
-                                            </div>
-                                        </MenuButton>
+                        {/* Left */}
+                        <div className="flex items-center space-x-10">
+                            <img
+                                src="https://www.getjupita.com/assets/jupita-logo-DBEWlkI2.jpg"
+                                alt="Logo"
+                                className="h-12 w-auto"
+                            />
 
-                                        <MenuItems
-                                            transition
-                                            className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-gray-800 py-1 outline-1 -outline-offset-1 outline-white/10 transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-                                        >
-                                            {userNavigation.map((item) => (
-                                                <MenuItem key={item.name}>
-                                                    <a
-                                                        href={item.href}
-                                                        onClick={item.onclick}
-                                                        className="block px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5 data-focus:outline-hidden"
-                                                    >
-                                                        {item.name}
-                                                    </a>
-                                                </MenuItem>
-                                            ))}
-                                        </MenuItems>
-                                    </Menu>
-                                </div>
-                            </div>
-                            <div className="-mr-2 flex md:hidden">
-                                {/* Mobile menu button */}
-                                <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-white/5 hover:text-white focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500">
-                                    <span className="absolute -inset-0.5" />
-                                    <span className="sr-only">Open main menu</span>
-                                    <Bars3Icon aria-hidden="true" className="block size-6 group-data-open:hidden" />
-                                    <XMarkIcon aria-hidden="true" className="hidden size-6 group-data-open:block" />
-                                </DisclosureButton>
-                            </div>
-                        </div>
-                    </div>
-
-                    <DisclosurePanel className="md:hidden">
-                        <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
-                            {navigation.map((item) => (
-                                <DisclosureButton
-                                    key={item.name}
-                                    as="a"
-                                    href={item.href}
-                                    aria-current={item.current ? 'page' : undefined}
-                                    className={classNames(
-                                        item.href == currentPath ? 'bg-gray-950/50 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white',
-                                        'block rounded-md px-3 py-2 text-base font-medium',
-                                    )}
-                                >
-                                    {item.name}
-                                </DisclosureButton>
-                            ))}
-                        </div>
-                        <div className="border-t border-white/10 pt-4 pb-3">
-                            <div className="flex items-center px-5">
-                                <div className="shrink-0">
-                                    <img
-                                        alt=""
-                                        src="https://static.vecteezy.com/system/resources/thumbnails/003/337/584/small/default-avatar-photo-placeholder-profile-icon-vector.jpg"
-                                        className="size-10 rounded-full outline -outline-offset-1 outline-white/10"
-                                    />
-                                </div>
-                                <div className="ml-3">
-                                    <div className="text-base/5 font-medium text-white">{user.full_name}</div>
-                                    <div className="text-sm font-medium text-gray-400">{user.email}</div>
-                                </div>
-
-                            </div>
-                            <div className="mt-3 space-y-1 px-2">
-                                {userNavigation.map((item) => (
-                                    <DisclosureButton
+                            <div className="hidden md:flex space-x-4">
+                                {navigation.map((item) => (
+                                    <Link
                                         key={item.name}
-                                        as="a"
-                                        href={item.href}
-                                        onClick={item.onclick}
-                                        className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-white/5 hover:text-white"
+                                        to={item.href}
+                                        className={classNames(
+                                            currentPath === item.href
+                                                ? "bg-blue-100 text-blue-700"
+                                                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                                            "px-3 py-2 rounded-md text-sm font-medium transition"
+                                        )}
                                     >
                                         {item.name}
-                                    </DisclosureButton>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
-                    </DisclosurePanel>
-                </Disclosure>
 
-                <header className="relative bg-gray-800 after:pointer-events-none after:absolute after:inset-x-0 after:inset-y-0 after:border-y after:border-white/10">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        <h1 className="text-3xl font-bold tracking-tight text-white">{title}</h1>
-                    </div>
-                </header>
-                <main>
-                    {loading && (
-                        <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
-                            <Loader />
+                        {/* Right */}
+                        <div className="hidden md:flex items-center space-x-4">
+
+                            <Menu as="div" className="relative">
+                                <MenuButton className="flex items-center space-x-3 focus:outline-none">
+                                    <img
+                                        src="https://static.vecteezy.com/system/resources/thumbnails/003/337/584/small/default-avatar-photo-placeholder-profile-icon-vector.jpg"
+                                        alt=""
+                                        className="h-9 w-9 rounded-full border border-gray-300"
+                                    />
+                                    <div className="text-left">
+                                        <p className="text-sm font-semibold text-gray-800">
+                                            {user.full_name}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            {user.email}
+                                        </p>
+                                    </div>
+                                </MenuButton>
+
+                                <MenuItems className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 focus:outline-none z-50">
+                                    {userNavigation.map((item) => (
+                                        <MenuItem key={item.name}>
+                                            {({ active }) =>
+                                                item.href ? (
+                                                    <Link
+                                                        to={item.href}
+                                                        className={classNames(
+                                                            active
+                                                                ? "bg-gray-100"
+                                                                : "",
+                                                            "block px-4 py-2 text-sm text-gray-700"
+                                                        )}
+                                                    >
+                                                        {item.name}
+                                                    </Link>
+                                                ) : (
+                                                    <button
+                                                        onClick={item.action}
+                                                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                                    >
+                                                        {item.name}
+                                                    </button>
+                                                )
+                                            }
+                                        </MenuItem>
+                                    ))}
+                                </MenuItems>
+                            </Menu>
                         </div>
-                    )}
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</div>
-                </main>
-            </div>
-        </>
-    )
+
+                        {/* Mobile Button */}
+                        <div className="md:hidden">
+                            <DisclosureButton className="p-2 text-gray-500 hover:text-gray-700">
+                                <Bars3Icon className="h-6 w-6" />
+                            </DisclosureButton>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobile Menu */}
+                <DisclosurePanel className="md:hidden px-4 pb-4">
+                    {navigation.map((item) => (
+                        <Link
+                            key={item.name}
+                            to={item.href}
+                            className="block py-2 text-gray-600 hover:text-gray-900"
+                        >
+                            {item.name}
+                        </Link>
+                    ))}
+
+                    <div className="border-t mt-3 pt-3">
+                        <Link
+                            to={`/users/${user.id}/edit`}
+                            className="block py-2 text-gray-600"
+                        >
+                            Settings
+                        </Link>
+                        <button
+                            onClick={handleLogout}
+                            className="block py-2 text-red-600"
+                        >
+                            Log out
+                        </button>
+                    </div>
+                </DisclosurePanel>
+            </Disclosure>
+
+            <header className="bg-white border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 py-6">
+                    <h1 className="text-2xl font-bold text-gray-800">
+                        {title}
+                    </h1>
+                </div>
+            </header>
+
+            <main className="max-w-7xl mx-auto px-4 py-6">
+                {children}
+            </main>
+        </div>
+    );
 }
